@@ -43,15 +43,15 @@ int one7SegCathode = 13; // D13
 byte one7SegAnodes[] = {4,5,8,6,7,3,2,9};
 volatile byte digitBits[] = {
   B00000000, // 0 -> (space)
-  B00001100, // 1
-  B11011010, // 2
-  B10011110, // 3
-  B00101110, // 4
-  B10110110, // 5
-  B11110110, // 6
-  B00011100, // 7
-  B11111110, // 8
-  B10111110, // 9
+  B00001100, // 1 ----EF--
+  B11011010, // 2 ABxDE-G-
+  B11110010, // 3 ABCD--G-
+  B01100110, // 4 -BC--FG-
+  B10110110, // 5 A-CD-FG-
+  B10111110, // 6 A-CDEFG-
+  B11100000, // 7 ABC-----
+  B11111110, // 8 ABCDEFG-
+  B11110110, // 9 ABCD_FG-
 };
 
 void SetupMatrix()
@@ -100,6 +100,17 @@ void One7SegTest()
   }
   
   digitalWrite(one7SegCathode,HIGH); // Turn off the digit
+}
+
+void DisplayNumber(byte digit) {
+  
+}
+
+void CountDown(byte highDigit)
+{
+  for (byte digit=highDigit; digit>=0; digit--) {
+    DisplayNumber(digit);
+  }
 }
 
 void LiftMeUp()
