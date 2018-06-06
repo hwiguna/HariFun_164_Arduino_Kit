@@ -24,7 +24,9 @@ void setup() {
 }
 
 void loop() {
-  LCDPrint("Hello");
+  //LCDPrint("Hello");
+  ClearBitmap();
+  ScanTestWithShiftRegister();
   
   ClearBitmap();
   DrawX();
@@ -62,6 +64,7 @@ void ClearBitmap()
     bitmap[i]=0;
   }
 }
+
 void Refresh()
 {
   for (byte r = 0; r < 8; r++)
@@ -92,6 +95,18 @@ void ScanTest()
       digitalWrite(col, HIGH);
     }
     digitalWrite(row, LOW);
+  }
+}
+
+void ScanTestWithShiftRegister()
+{
+  for (byte r = 0; r < 8; r++)
+  {
+    for (byte c = 0; c < 8; c++) {
+      bitSet(bitmap[r],c);
+      for (int i=0;i<5;i++) Refresh();
+      bitClear(bitmap[r],c);
+    }
   }
 }
 
