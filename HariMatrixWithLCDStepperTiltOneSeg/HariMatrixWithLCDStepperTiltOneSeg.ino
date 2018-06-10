@@ -103,13 +103,19 @@ void One7SegTest()
 }
 
 void DisplayNumber(byte digit) {
-  
+  for (byte seg=0; seg<8; seg++)
+  {
+    digitalWrite(one7SegAnodes[seg], bitRead(digitBits[digit], 7-seg) );
+  }
 }
 
 void CountDown(byte highDigit)
 {
   for (byte digit=highDigit; digit>=0; digit--) {
     DisplayNumber(digit);
+     digitalWrite(one7SegCathode,LOW); // Turn on the digit
+    delay(500);
+    digitalWrite(one7SegCathode,HIGH); // Turn off the digit
   }
 }
 
@@ -133,11 +139,12 @@ void setup() {
   SetupLCD();
   SetupTiltSwitch();
   SetupOne7Seg();
+  CountDown(9);
 }
 
 void loop() {
   //-- Seven Segment --
-  One7SegTest();
+  //One7SegTest();
   
   //-- Lift me up to start... --
   LiftMeUp();
