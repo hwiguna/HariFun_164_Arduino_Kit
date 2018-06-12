@@ -2,9 +2,10 @@ const byte col0 = 10;
 const byte col1 = 11;
 const byte col2 = 12;
 const byte col3 = 13;
-unsigned long timeToScroll = 0;
+unsigned long timeToUpdate = 0;
+int lastValue;
 byte offset=0;
-char message[] = "bacdefghijklmnop";
+char message[] = "1234";
   
 const byte segmentA = 2;
 // --A--
@@ -114,7 +115,7 @@ byte bitmap[] = {
 //  B00111000, // u
 //  B00101010, // n
 };
-byte messageLen = sizeof(message)/sizeof(char);
+byte messageLen = sizeof(message)/sizeof(char) - 1; // -1 to remove the terminating null character at the end of string.
 
 void setup() {
   for (byte i=segmentA; i<=col3; i++)
@@ -124,22 +125,36 @@ void setup() {
 }
 
 void loop() {
-  if (millis()>=timeToScroll) {
-    timeToScroll = millis() + 500;
-    if (offset++>(messageLen+4)) offset=0;
-  }
-
-  for (byte col=0; col<messageLen; col++)
-    {
-      int c = 3 - offset + col;
-      if (c>=0 && c<4) {
-        byte theChar = bitmap[ message[col] - ' ' ];
+  GetData();
+  
+  int messageStart = 0;
+  for (byte c=0; c<4; c++)
+  {
+    int messageIndex = messageStart + c;
+    if (messageIndex<messageLen) {
+      byte theChar = bitmap[ message[messageIndex] - ' ' ];
       for (byte seg=0; seg<8; seg++) {
         digitalWrite(segmentA+seg,!bitRead(theChar,7-seg));
       }
       digitalWrite(col0+c, HIGH);
       delayMicroseconds(100);
       digitalWrite(col0+c, LOW);
-      }
     }
+  }
 }
+
+void GetData()
+{
+  if (millis() > timeToUpdate) {
+  int analogValue = analogRead(A7);
+  if (abs(analogValue-lastValue)>5) {
+  message[3] = '0' + (analogValue % 10);
+  message[2] = '0' + (analogValue % 100) / 10;
+  message[1] = '0' + (analogValue % 1000) / 100;
+  message[0] = '0' + (analogValue / 1000);
+  lastValue = analogValue;
+  }
+  timeToUpdate = millis() + 100;
+  }
+}
+

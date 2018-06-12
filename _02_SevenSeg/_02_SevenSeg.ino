@@ -24,6 +24,11 @@ void SetupOne7Seg()
 {
   pinMode(one7SegCathode,OUTPUT);
   digitalWrite(one7SegCathode,HIGH); // HIGH = Off
+  
+  for (byte i=0; i<8; i++) {
+    pinMode(one7SegAnodes[i],OUTPUT);
+    digitalWrite(one7SegAnodes[i],LOW);
+  }
 }
 
 void TestOne7Seg()
@@ -52,7 +57,7 @@ void DisplayNumber(byte digit) {
 
 void CountDown(byte highDigit)
 {
-  for (byte digit=highDigit; digit>=0; digit--) {
+  for (int digit=highDigit; digit>=0; digit--) {
     DisplayNumber(digit);
     digitalWrite(one7SegCathode,LOW); // Turn on the digit
     delay(500);

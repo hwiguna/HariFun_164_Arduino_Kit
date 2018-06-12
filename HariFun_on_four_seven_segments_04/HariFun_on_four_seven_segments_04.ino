@@ -4,8 +4,9 @@ const byte col2 = 12;
 const byte col3 = 13;
 unsigned long timeToScroll = 0;
 byte offset=0;
-char message[] = "bacdefghijklmnop";
-  
+char message[] = "HELLO dAVId - Hello Seon -  Can you read this?"; // TUitter
+int scrollSpeed = 200;
+
 const byte segmentA = 2;
 // --A--
 // F   B
@@ -46,7 +47,7 @@ byte bitmap[] = {
   0, // <
   0, // =
   0, // >
-  0, // ?
+  B11001010, // ?
   0, // @
   B11101110, // A
   B11111110, // B
@@ -87,7 +88,7 @@ byte bitmap[] = {
   B11011110, // e
   B10001110, // f
   B11110110, // g
-  B01101110, // h
+  B00101110, // h
   B00001100, // i
   B01111000, // j
   B00101110, // k
@@ -114,7 +115,7 @@ byte bitmap[] = {
 //  B00111000, // u
 //  B00101010, // n
 };
-byte messageLen = sizeof(message)/sizeof(char);
+byte messageLen = sizeof(message)/sizeof(char) - 1; // -1 to remove the terminating null character at the end of string.
 
 void setup() {
   for (byte i=segmentA; i<=col3; i++)
@@ -124,22 +125,23 @@ void setup() {
 }
 
 void loop() {
-  if (millis()>=timeToScroll) {
-    timeToScroll = millis() + 500;
-    if (offset++>(messageLen+4)) offset=0;
-  }
-
-  for (byte col=0; col<messageLen; col++)
-    {
-      int c = 3 - offset + col;
-      if (c>=0 && c<4) {
-        byte theChar = bitmap[ message[col] - ' ' ];
+  int messageStart = offset;
+  for (byte c=0; c<4; c++)
+  {
+    int messageIndex = messageStart + c;
+    if (messageIndex<messageLen) {
+      byte theChar = bitmap[ message[messageIndex] - ' ' ];
       for (byte seg=0; seg<8; seg++) {
         digitalWrite(segmentA+seg,!bitRead(theChar,7-seg));
       }
       digitalWrite(col0+c, HIGH);
       delayMicroseconds(100);
       digitalWrite(col0+c, LOW);
-      }
     }
+  }
+
+  if (millis()>=timeToScroll) {
+    timeToScroll = millis() + scrollSpeed;
+    if (++offset>messageLen) offset=0;
+  }
 }
