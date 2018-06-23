@@ -4,9 +4,12 @@ const byte col2 = 12;
 const byte col3 = 13;
 unsigned long timeToScroll = 0;
 byte offset=0;
-char message[] = "   HELLO SteVe -  Can you read this?"; // TUitter
+char message[] = "   HELLO Steve -  Can you read this?";
 //char message[] = "HELLO dAVId - Hello Seon -  Can you read this?"; // TUitter
-int scrollSpeed = 250;
+int scrollSpeed = 300;
+
+// LightMeter
+int lastValue;
 
 const byte segmentA = 2;
 // --A--
@@ -125,7 +128,33 @@ void setup() {
     digitalWrite(col0+col, LOW);
 }
 
+
+bool GetLightData()
+{
+  int analogValue = analogRead(A7);
+  bool IsLightMeter = (analogValue != 1023);
+  
+  if (millis() > timeToScroll) {
+  if (IsLightMeter)
+  {
+    if (abs(analogValue-lastValue)>5) {
+      message[3] = '0' + (analogValue % 10);
+      message[2] = '0' + (analogValue % 100) / 10;
+      message[1] = '0' + (analogValue % 1000) / 100;
+      message[0] = '0' + (analogValue / 1000);
+      lastValue = analogValue;
+    }
+      timeToScroll = millis() + 100;
+    }
+  }
+
+  return IsLightMeter;
+}
+
 void loop() {
+  bool IsLightMeter = GetLightData();
+
+  // Display message
   int messageStart = offset;
   for (byte c=0; c<4; c++)
   {
@@ -141,7 +170,7 @@ void loop() {
     }
   }
 
-  if (millis()>=timeToScroll) {
+  if ( !IsLightMeter && (millis()>=timeToScroll)) {
     timeToScroll = millis() + scrollSpeed;
     if (++offset>messageLen) offset=0;
   }
